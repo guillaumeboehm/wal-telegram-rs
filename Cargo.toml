@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 xdg = "2.5.2"
+regex = "1.9.5"

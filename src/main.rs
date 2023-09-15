@@ -1,13 +1,12 @@
-mod wal;
+mod palette;
 mod color;
-mod telegram_colors;
+mod telegram;
 
-use crate::telegram_colors::get_telegram_colors;
-use crate::wal::import_wal_colors;
+use crate::telegram::colors::get_telegram_colors;
+use crate::palette::wal::import_wal_colors;
 
 fn main() {
 
-    // println!("{}", a.get_contrast(&b));
     let mut colors = import_wal_colors(None);
 
     color::compute_contrasts(&mut colors);
