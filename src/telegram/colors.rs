@@ -41,6 +41,18 @@ pub fn get_telegram_colors(colors: &HashMap<String, Rc<RefCell<Color>>>) -> Stri
         return col;
     };
 
+    add_comment("Color palette");
+    let mut color_keys: Vec<_> = colors.keys().collect();
+    color_keys.sort_by(|a, b| {
+        let a_int: u32 = a.split_at(5).1.parse().unwrap();
+        let b_int: u32 = b.split_at(5).1.parse().unwrap();
+        a_int.cmp(&b_int)
+    });
+
+    for col_name in color_keys {
+        add_color(format!("{col_name}").as_str(), colors[col_name].clone());
+    }
+
     add_comment("Colors for testing purposes");
     add_color("colorPink", Rc::new(RefCell::new(Color::from_hex("ff7fc6").unwrap())));
     add_color("colorGreen", Rc::new(RefCell::new(Color::from_hex("0bd500").unwrap())));

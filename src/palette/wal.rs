@@ -45,9 +45,31 @@ pub fn import_wal_palette(wal_colors_path: &str) -> HashMap<String, Rc<RefCell<C
 
     let mut palette = HashMap::new();
 
+    // Vector to store the colors before sorting them by luminance
+    let mut colors_vec: Vec<(f32, Rc<RefCell<Color>>)> = Vec::new();
+    
+    let mut color_vec_count = 0;
     for (index, col) in palette_file.lines().into_iter().enumerate() {
-        palette.insert(format!("color{index}"), Rc::new(RefCell::new(Color::from_hex(col).unwrap())));
+        // If one of the main bg or fg colors
+        if index == 0 || index == 7 || index == 8 || index == 15 {
+            palette.insert(format!("color{index}"), Rc::new(RefCell::new(Color::from_hex(col).unwrap())));
+        }
+        else {
+            let col = Rc::new(RefCell::new(Color::from_hex(col).unwrap()));
+            colors_vec.push((col.borrow().get_relative_luminance(), col.clone()));
+        }
+
+        // Process the 8 (minus first and last) first colors
+        if colors_vec.len() == 6 {
+            colors_vec.sort_by_key(|(lum, _)| (lum * 1000000000.0) as u32);
+            for (ind, col) in colors_vec.iter().enumerate() {
+                palette.insert(format!("color{}", color_vec_count+ind+1), col.1.clone());
+            }
+            color_vec_count += colors_vec.len() + 2; // Plus first and last color
+            colors_vec.clear();
+        }
     }
+
     // Double colors if not wal16
     if palette.len() < 16 {
         let len = palette.len();

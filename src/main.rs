@@ -3,18 +3,13 @@ mod color;
 mod telegram;
 mod background;
 
-use crate::telegram::colors::get_telegram_colors;
-use crate::palette::wal::import_wal_palette;
+use crate::palette::wal;
 
 fn main() {
 
     // If wal then wal else custom blabla
-    let palette = import_wal_palette("");
-
+    let palette = wal::import_wal_palette("");
     color::compute_contrasts(&palette);
-
-    // use palette for telegram colors
-    let telegram_colors = get_telegram_colors(&palette);
 
     // Lets say it's wal background
     let bg = background::wal::fetch_wal_background(None);
