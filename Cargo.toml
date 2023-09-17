@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 xdg = "2.5.2"
 regex = "1.9.5"
+rand = "0.8.5"
+zip = "0.6.6"
