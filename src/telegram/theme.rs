@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::io;
 use std::io::Write;
 use std::rc::Rc;
 
@@ -58,7 +57,7 @@ fn process_output(output_str: &Option<&str>) -> std::path::PathBuf {
     return output_path;
 }
 
-fn write_entire_file(writer: &mut zip::ZipWriter<std::fs::File>, data: &[u8]) -> io::Result<()> {
+fn write_entire_file(writer: &mut zip::ZipWriter<std::fs::File>, data: &[u8]) -> std::io::Result<()> {
     let mut bytes_written = 0;
 
     while bytes_written < data.len() {
@@ -100,19 +99,7 @@ pub fn package_theme(output: Option<&str>, input_background: &str, tiled: bool, 
     };
 
     // Tmp files
-    let mut bg_filename;
-    bg_filename = String::from(if tiled { "tiled." } else { "background." });
-    if let Some(ext_osstr) = std::path::Path::new(input_background).extension() {
-        if let Some(ext_str) = ext_osstr.to_str() {
-            bg_filename.push_str(ext_str);
-        }
-        else {
-            bg_filename.push_str(".png");
-        }
-    }
-    else {
-        bg_filename.push_str(".png");
-    }
+    let bg_filename = String::from(if tiled { "tiled" } else { "background" }) + ".jpg";
     let mut tmp_bg = tmp_dir.clone();
     tmp_bg.push(&bg_filename);
 
@@ -123,13 +110,8 @@ pub fn package_theme(output: Option<&str>, input_background: &str, tiled: bool, 
     tmp_theme.push("wal_telegram.tdesktop-theme");
 
     // Copy the background to the tmp folder
-    match std::fs::copy(&input_background, &tmp_bg) {
-        Ok(_) => {}
-        Err(err) => {
-            eprintln!("Error trying to copy '{}' to '{}'", &input_background, &tmp_bg.display());
-            panic!("Error: {}", err);
-        }
-    };
+    // BUG: Try to read the byte slice directly with 'image'
+    // Couldn't make it work for some reason
     let bg_contents;
     match std::fs::read(&input_background) {
         Ok(contents) => {
@@ -140,6 +122,10 @@ pub fn package_theme(output: Option<&str>, input_background: &str, tiled: bool, 
             panic!("Error: {}", err);
         }
     };
+    // INFO: Trying to make it an image to verify it's validity
+    let bg_img = image::load_from_memory(&bg_contents.as_slice())
+                            .expect(format!("Could not recognize background file '{}' as an image", tmp_bg.display()).as_str());
+    bg_img.save_with_format(&tmp_bg, image::ImageFormat::Jpeg).expect("Couldn't save the tmp background file to the tmp folder");
 
     // Generate the colors
     let telegram_colors = super::colors::get_telegram_colors(&input_palette);
@@ -161,10 +147,9 @@ pub fn package_theme(output: Option<&str>, input_background: &str, tiled: bool, 
             match zip_writer.start_file(tmp_bg.file_name().unwrap().to_str().unwrap(), options) {
                 Ok(_) => { 
                     match write_entire_file(&mut zip_writer, bg_contents.as_slice()) {
-                    // match zip_writer.write(bg_contents.as_slice()) {
                         Ok(_) => { }
                         Err(err) => {
-                            eprintln!("Error trying to write '{}' to the temporary telegram theme zip '{}'", &tmp_palette.display(), &tmp_theme.display());
+                            eprintln!("Error trying to write '{}' to the temporary telegram theme zip '{}'", &tmp_bg.display(), &tmp_theme.display());
                             panic!("Error: {}", err);
                         }
                     };
@@ -181,7 +166,7 @@ pub fn package_theme(output: Option<&str>, input_background: &str, tiled: bool, 
                     // match zip_writer.write(telegram_colors.as_bytes()) {
                         Ok(_) => { }
                         Err(err) => {
-                            eprintln!("Error trying to write '{}' to the temporary telegram theme zip '{}'", &tmp_bg.display(), &tmp_theme.display());
+                            eprintln!("Error trying to write '{}' to the temporary telegram theme zip '{}'", &tmp_palette.display(), &tmp_theme.display());
                             panic!("Error: {}", err);
                         }
                     };
