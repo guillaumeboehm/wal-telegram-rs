@@ -73,23 +73,31 @@ impl Color {
 
         let hex = hex.trim_start_matches('#');
         if hex.len() == 6 {
-            if let Ok(color) = u32::from_str_radix(hex, 16) {
-                col.red = ((color >> 16) & 0xFF) as f32 / 255.0;
-                col.green = ((color >> 8) & 0xFF) as f32 / 255.0;
-                col.blue = (color & 0xFF) as f32 / 255.0;
-
-                return Some(col);
+            if let Ok(color) = u32::from_str_radix(&hex[0..2], 16) {
+                col.red = color as f32 / 255.0;
             }
+            if let Ok(color) = u32::from_str_radix(&hex[2..4], 16) {
+                col.green = color as f32 / 255.0;
+            }
+            if let Ok(color) = u32::from_str_radix(&hex[4..6], 16) {
+                col.blue = color as f32 / 255.0;
+            }
+            return Some(col);
         }
         else if hex.len() == 9 {
-            if let Ok(color) = u32::from_str_radix(hex, 16) {
-                col.red = ((color >> 24) & 0xFF) as f32 / 255.0;
-                col.green = ((color >> 16) & 0xFF) as f32 / 255.0;
-                col.blue = ((color >> 8) & 0xFF) as f32 / 255.0;
-                col.alpha = (color & 0xFF) as f32 / 255.0;
-
-                return Some(col);
+            if let Ok(color) = u32::from_str_radix(&hex[0..2], 16) {
+                col.red = color as f32 / 255.0;
             }
+            if let Ok(color) = u32::from_str_radix(&hex[2..4], 16) {
+                col.green = color as f32 / 255.0;
+            }
+            if let Ok(color) = u32::from_str_radix(&hex[4..6], 16) {
+                col.blue = color as f32 / 255.0;
+            }
+            if let Ok(color) = u32::from_str_radix(&hex[6..8], 16) {
+                col.alpha = color as f32 / 255.0;
+            }
+            return Some(col);
         }
 
         return None;
@@ -110,7 +118,7 @@ impl Color {
     }
 
     pub fn to_hex(&self) -> String {
-        return format!( "{:02x}{:02x}{:02x}{:02x}", self.u8_red(), self.u8_blue(), self.u8_green(), self.u8_alpha());
+        return format!( "{:02x}{:02x}{:02x}{:02x}", self.u8_red(), self.u8_green(), self.u8_blue(), self.u8_alpha());
     }
 
     // Setters
@@ -140,7 +148,7 @@ impl Color {
 
     // TODO: Use proper luminance calculation ?
     pub fn darker(&self, percentage: u8) -> Rc<RefCell<Color>> {
-        let perc = percentage as f32;
+        let perc = (percentage as f32) / 100.0;
 
         let darker_color_point = |c: f32| {
             return (c - c * perc).clamp(0.0, 1.0);
@@ -155,7 +163,7 @@ impl Color {
     }
 
     pub fn lighter(&self, percentage: u8) -> Rc<RefCell<Color>> {
-        let perc = percentage as f32;
+        let perc = (percentage as f32) / 100.0;
 
         let lighter_color_point = |c: f32| {
             return (c + c * perc).clamp(0.0, 1.0);
@@ -170,10 +178,10 @@ impl Color {
     }
 
     pub fn alpha(&self, percentage: u8) -> Rc<RefCell<Color>> {
-        let perc = percentage.clamp(0, 100) as f32;
+        let perc = (percentage.clamp(0, 100) as f32) / 100.0;
 
         let mut col = self.clone();
-        col.alpha = perc/100.0;
+        col.alpha = perc;
 
         return Rc::new(RefCell::new(col));
     }
@@ -187,7 +195,8 @@ impl Color {
             return c.unwrap().clone();
         }
         else {
-            panic!("Contrast index out of scope");
+            eprintln!("WARNING! Contrast index out of scope, returning the same color");
+            return Rc::new(RefCell::new(self.clone()));
         }
     }
 }
