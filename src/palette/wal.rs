@@ -6,10 +6,10 @@ use std::rc::Rc;
 
 use crate::color::Color;
 
-pub fn import_wal_palette(wal_colors_path: &str) -> HashMap<String, Rc<RefCell<Color>>> {
+pub fn import_wal_palette(wal_colors_path: Option<&str>) -> HashMap<String, Rc<RefCell<Color>>> {
 
     let filepath;
-    if wal_colors_path.is_empty() {
+    if wal_colors_path.is_none() {
         // Try to get wal from the default location
         if let Ok(xdg_dirs) = xdg::BaseDirectories::new() {
             filepath = String::from(xdg_dirs.find_cache_file("wal/colors")
@@ -29,8 +29,12 @@ pub fn import_wal_palette(wal_colors_path: &str) -> HashMap<String, Rc<RefCell<C
     }
     else
     {
+        if wal_colors_path.unwrap().is_empty() {
+            panic!("wal color path can not be an empty string");
+        }
+
         let mut path = path::PathBuf::new();
-        path.push(wal_colors_path);
+        path.push(wal_colors_path.unwrap());
         path.push("/colors");
 
         if !path.exists() {

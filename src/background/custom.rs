@@ -1,7 +1,7 @@
 use std::path;
 
 // Check if the background file exists
-pub fn verify_custom_background(background_path: &str) -> String {
+pub fn use_custom_background(tmp_dir: &std::path::PathBuf, blur: f32, background_path: &str) {
 
     let path;
     if background_path.is_empty() {
@@ -16,5 +16,5 @@ pub fn verify_custom_background(background_path: &str) -> String {
         }
     }
 
-    return String::from(path.to_str().unwrap());
+    super::copy_background(&tmp_dir, blur, path.to_str().unwrap());
 }

@@ -2,7 +2,7 @@ use std::fs;
 use std::path;
 
 // Try to fetch the background image from 'wal' file in wal cache
-pub fn fetch_wal_background(wal_colors_path: Option<&str>) -> String {
+pub fn use_wal_background(tmp_dir: &std::path::PathBuf, blur: f32, wal_colors_path: Option<&str>) {
 
     let filepath;
     if wal_colors_path.is_none() || wal_colors_path.unwrap().is_empty() {
@@ -50,6 +50,6 @@ pub fn fetch_wal_background(wal_colors_path: Option<&str>) -> String {
         }
     }
 
-    return String::from(path.to_str().unwrap());
+    super::copy_background(tmp_dir, blur, path.to_str().unwrap());
 }
 

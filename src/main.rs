@@ -1,21 +1,21 @@
-mod palette;
-mod color;
-mod telegram;
 mod background;
-
-use crate::palette::wal;
+mod color;
+mod palette;
+mod telegram;
+mod tmp_dir;
 
 fn main() {
-
-    // If wal then wal else custom blabla
-    let palette = wal::import_wal_palette("");
-    color::compute_contrasts(&palette);
-
-    // Lets say it's wal background
-    let bg = background::wal::fetch_wal_background(None);
-
     // env variable for script always yes
     std::env::set_var("WAL_TELEGRAM_YES_ALL", "TRUE");
+    // Create tmp dir
+    let tmp_dir = tmp_dir::create_tmp_dir();
 
-    telegram::theme::package_theme(None, bg.as_str(), false, &palette);
+    // If wal then wal else custom blabla
+    let palette = palette::generate_palette(palette::Palette::Wal, None);
+
+    // Lets say it's wal background
+    background::generate_background(&tmp_dir, background::Background::Wal, 0.1, None, None);
+    // background::generate_background(&tmp_dir, background::Background::Plain, 0.0, Some(&palette), None);
+
+    telegram::theme::package_theme(&tmp_dir, None, &palette);
 }

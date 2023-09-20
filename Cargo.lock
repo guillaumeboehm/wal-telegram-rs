@@ -62,6 +62,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "blurslice"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ad73c1456d8431da101a70616474273cf418382a3df426600a331a807b430f13"
+
+[[package]]
 name = "bumpalo"
 version = "3.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -830,6 +836,7 @@ checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 name = "wal-telegram-rs"
 version = "0.1.0"
 dependencies = [
+ "blurslice",
  "image",
  "rand",
  "regex",
