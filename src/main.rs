@@ -14,8 +14,8 @@ fn main() {
     let palette = palette::generate_palette(palette::Palette::Wal, None);
 
     // Lets say it's wal background
-    background::generate_background(&tmp_dir, background::Background::Wal, 0.1, None, None);
-    // background::generate_background(&tmp_dir, background::Background::Plain, 0.0, Some(&palette), None);
+    // background::wal::use_wal_background(&tmp_dir, 0.1, None);
+    background::plain::use_plain_image(&tmp_dir, Some(&palette), None);
 
     telegram::theme::package_theme(&tmp_dir, None, &palette);
 }

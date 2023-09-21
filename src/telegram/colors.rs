@@ -57,6 +57,10 @@ pub fn get_telegram_colors(colors: &HashMap<String, Rc<RefCell<Color>>>) -> Stri
     add_color("colorPink", Rc::new(RefCell::new(Color::from_hex("ff7fc6").unwrap())));
     add_color("colorGreen", Rc::new(RefCell::new(Color::from_hex("0bd500").unwrap())));
 
+    add_comment("Special common colors");
+    add_color("colorError", Rc::new(RefCell::new(Color::from_hex("#d55070").unwrap())));
+    add_color("colorSuccess", Rc::new(RefCell::new(Color::from_hex("#6bf576").unwrap())));
+
     add_comment("Basic window options");
     // \/ bg left menu list items + right click menu
     add_color("windowBg", get_element("color0").clone());
@@ -91,12 +95,11 @@ pub fn get_telegram_colors(colors: &HashMap<String, Rc<RefCell<Color>>>) -> Stri
     add_comment("Shadow");
     // \/ most shadows (with opacity) (the color of the divider between parts of the home screen)
     add_color("shadowFg", get_element("windowBg").borrow().contrast(3).borrow().alpha(30));
-    // TODO: Reworked until here
 
     add_comment("Slide");
-    // \/ animation that appears when you press the arrow of a forwarded message (from chat to profile)
+    // \/ Slide animation that appears when you press the arrow of a forwarded message (from chat to profile), or in the right drawer when looking at posted elements from the User Info menu.
     add_color("slideFadeOutBg", colors["color0"].borrow().alpha(10));
-    // \/ still talking about the animation explained above, it is the line on the right side that moves to the left
+    // \/ [UNTESTED]: still talking about the animation explained above, it is the line on the right side that moves to the left
     add_color("slideFadeOutShadowFg", get_element("windowShadowFg"));
 
     add_comment("Image");
@@ -106,25 +109,27 @@ pub fn get_telegram_colors(colors: &HashMap<String, Rc<RefCell<Color>>>) -> Stri
     add_color("imageBgTransparent", colors["color7"].clone());
 
     add_comment("Active");
-    // \/ bg color active button, like the first button at the top left in the options menu
+    // \/ bg color active button, eg. first button at the top left in the options menu, the "take a
+    // photo" button in the profile, "Add" button in sticker packs selection
     add_color("activeButtonBg", colors["color2"].clone());
     // \/ as above but with the cursor above
-    add_color("activeButtonBgOver", colors["color2"].borrow().lighter(30));
+    add_color("activeButtonBgOver", get_element("activeButtonBg").borrow().lighter(20));
     // \/ as above but ripple effect, click held
-    add_color("activeButtonBgRipple", colors["color2"].borrow().lighter(50));
+    add_color("activeButtonBgRipple", get_element("activeButtonBg").borrow().lighter(50));
     // \/ button text explained above
-    add_color("activeButtonFg", colors["color7"].clone());
+    add_color("activeButtonFg", get_element("activeButtonBg").borrow().contrast(0));
     // \/ Button text explained above but with cursor above
-    add_color("activeButtonFgOver", colors["color7"].borrow().lighter(30));
+    add_color("activeButtonFgOver", get_element("activeButtonFg").borrow().lighter(20));
     // \/ when you select a message, the numbers next to forward and delete
-    add_color("activeButtonSecondaryFg", colors["color7"].borrow().lighter(50));
+    add_color("activeButtonSecondaryFg", get_element("activeButtonBg").borrow().contrast(2));
     // \/ same as above but with the cursor above
-    add_color("activeButtonSecondaryFgOver", get_element("activeButtonSecondaryFg"));
-    // \/ like the line under the name choice when creating a group
+    add_color("activeButtonSecondaryFgOver", get_element("activeButtonSecondaryFg").borrow().lighter(20));
+    // \/ Input text bottom line when focused, eg. line under the name choice when creating a group
     add_color("activeLineFg", colors["color2"].clone());
     // \/ same as above but when errors occur
-    add_color("activeLineFgError", colors["color1"].clone());
+    add_color("activeLineFgError", get_element("colorError"));
 
+    // TODO: Reworked until here
     add_comment("Light");
     // \/ button on the right in the options menu and in short the light buttons
     add_color("lightButtonBg", colors["color0"].clone());

@@ -166,7 +166,7 @@ impl Color {
         let perc = (percentage as f32) / 100.0;
 
         let lighter_color_point = |c: f32| {
-            return (c + c * perc).clamp(0.0, 1.0);
+            return (c + (1.0 - c) * perc).clamp(0.0, 1.0);
         };
 
         let mut col = self.clone();
@@ -220,4 +220,22 @@ pub fn compute_contrasts(colors: &HashMap<String, Rc<RefCell<Color>>>) {
 
         colors[format!("color{index}").as_str()].borrow_mut().set_contrasts(Vec::from(contrasts_vec));
     }
+}
+
+pub fn average_color(colors: Vec<Color>) -> Color {
+    let mut ret_col: Color = Color::new();
+
+    for color in &colors {
+        ret_col.red += color.red;
+        ret_col.green += color.green;
+        ret_col.blue += color.blue;
+        ret_col.alpha += color.alpha;
+    }
+
+    ret_col.red /= colors.len() as f32;
+    ret_col.green /= colors.len() as f32;
+    ret_col.blue /= colors.len() as f32;
+    ret_col.alpha /= colors.len() as f32;
+
+    return ret_col;
 }
